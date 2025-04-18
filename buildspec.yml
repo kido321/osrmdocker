@@ -3,24 +3,24 @@ version: 0.2
 phases:
   pre_build:
     commands:
-      - 'echo Logging in to Amazon ECR…'
+      - 'echo Logging in to Amazon ECR...'
       - AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-      - AWS_DEFAULT_REGION=${AWS_REGION}
+      - AWS_DEFAULT_REGION=$AWS_REGION
       - 'echo Using AWS Region: '"$AWS_DEFAULT_REGION"
-      - REPOSITORY_URI=${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/osrm
+      - REPOSITORY_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/osrm
       - IMAGE_TAG=us-latest
-      - aws ecr get-login-password --region "$AWS_DEFAULT_REGION" \
-        | docker login --username AWS --password-stdin "$REPOSITORY_URI"
+      - aws ecr get-login-password --region "$AWS_DEFAULT_REGION" | \
+        docker login --username AWS --password-stdin "$REPOSITORY_URI"
 
   build:
     commands:
       - 'echo Build started on '"$(date)"
-      - 'echo Building the Docker image…'
-      - docker build -t "${REPOSITORY_URI}:${IMAGE_TAG}" .
+      - 'echo Building the Docker image...'
+      - docker build -t "$REPOSITORY_URI:$IMAGE_TAG" .
       - 'echo Build completed on '"$(date)"
 
   post_build:
     commands:
-      - 'echo Pushing the Docker image to ECR…'
-      - docker push "${REPOSITORY_URI}:${IMAGE_TAG}"
+      - 'echo Pushing the Docker image to ECR...'
+      - docker push "$REPOSITORY_URI:$IMAGE_TAG"
       - 'echo Push completed.'
