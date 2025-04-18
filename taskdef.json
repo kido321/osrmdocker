@@ -1,0 +1,27 @@
+{
+    "family": "osrm",
+    "networkMode": "awsvpc",
+    "cpu": "2048",
+    "memory": "4096",
+    "requiresCompatibilities": ["FARGATE"],
+    "executionRoleArn": "arn:aws:iam::060795930178:role/ecsTaskExecutionRole",
+    "containerDefinitions": [
+        {
+          "name": "osrm",
+          "image": "060795930178.dkr.ecr.us-east-1.amazonaws.com/osrm:latest",
+          "essential": true,
+          "portMappings": [
+            { "containerPort": 5000, "protocol": "tcp" }
+          ],
+          "logConfiguration": {
+            "logDriver": "awslogs",
+            "options": {
+              "awslogs-group": "/ecs/osrm",
+              "awslogs-region": "us-east-1",
+              "awslogs-stream-prefix": "ecs"
+            }
+          }
+        }
+      ]    
+  }
+  
