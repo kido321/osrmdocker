@@ -5,19 +5,15 @@ phases:
     commands:
       - echo Logging in to Amazon ECR...
       - AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-      # --- CHANGE THIS LINE ---
-      - AWS_DEFAULT_REGION=$AWS_REGION # Use the built-in CodeBuild variable
-      # --- END CHANGE ---
-      - echo "Using AWS Region: $AWS_DEFAULT_REGION" # Added echo for verification
+      - AWS_DEFAULT_REGION=$AWS_REGION
+      - echo "Using AWS Region: $AWS_DEFAULT_REGION"
       - REPOSITORY_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/osrm
       - IMAGE_TAG=us-latest
       - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
-  # ... rest of buildspec ...
   build:
     commands:
       - echo Build started on `date`
       - echo Building the Docker image...
-      # Build the image - Docker build context is the current directory (.)
       - docker build -t $REPOSITORY_URI:$IMAGE_TAG .
       - echo Build completed on `date`
   post_build:
@@ -25,12 +21,3 @@ phases:
       - echo Pushing the Docker image to ECR...
       - docker push $REPOSITORY_URI:$IMAGE_TAG
       - echo Push completed.
-      # (Optional) You can output image details for use in later pipeline stages
-      # - printf '[{"name":"osrm-container","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
-
-# Optional: Define artifacts if you need build outputs for other pipeline stages
-# artifacts:
-#   files:
-#     - imagedefinitions.json
-
-
