@@ -4,14 +4,15 @@ phases:
   pre_build:
     commands:
       - echo Logging in to Amazon ECR...
-      # Retrieve AWS Account ID and Region dynamically
       - AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-      - AWS_DEFAULT_REGION=$(aws configure get region) # Assumes region is configured or uses instance metadata
-      # Construct ECR repository URI
-      - REPOSITORY_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/osrm # Use your ECR repo name 'osrm'
-      - IMAGE_TAG=us-latest # Specific tag for the US image
-      # Login Docker to ECR
+      # --- CHANGE THIS LINE ---
+      - AWS_DEFAULT_REGION=$AWS_REGION # Use the built-in CodeBuild variable
+      # --- END CHANGE ---
+      - echo "Using AWS Region: $AWS_DEFAULT_REGION" # Added echo for verification
+      - REPOSITORY_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/osrm
+      - IMAGE_TAG=us-latest
       - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
+  # ... rest of buildspec ...
   build:
     commands:
       - echo Build started on `date`
@@ -31,3 +32,5 @@ phases:
 # artifacts:
 #   files:
 #     - imagedefinitions.json
+
+
